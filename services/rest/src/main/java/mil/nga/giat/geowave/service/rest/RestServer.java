@@ -17,7 +17,6 @@ import org.restlet.routing.Router;
 public class RestServer extends
 		ServerResource
 {
-
 	private ArrayList<Route> availableRoutes;
 
 	/**
@@ -68,6 +67,29 @@ public class RestServer extends
 			}
 		}
 		// Provide basic 404 error page for unknown route
+		router.attachDefault(RestServer.class);
+
+		// Setup router
+		Application myApp = new Application() {
+			@Override
+			public org.restlet.Restlet createInboundRoot() {
+				router.setContext(getContext());
+				return router;
+			};
+		};
+		Component component = new Component();
+		component.getDefaultHost().attach(
+				"/",
+				myApp);
+
+		// Start server
+		try {
+			new Server(
+					Protocol.HTTP,
+					port,
+					component).start();
+		}
+    
 		router.attachDefault(RestServer.class);
 
 		// Setup router
